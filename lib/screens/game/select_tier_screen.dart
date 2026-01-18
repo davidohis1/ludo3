@@ -664,7 +664,7 @@ Future<List<GameModel>> _getAvailableGamesOnce(
 ) {
   final isHost = game.playerIds.first == user.id;
   final playerCount = game.playerIds.length;
-  final isFullLobby = playerCount == 2;
+  final isFullLobby = playerCount == 4;
 
   return Container(
     padding: const EdgeInsets.all(20),
@@ -820,7 +820,7 @@ Future<List<GameModel>> _getAvailableGamesOnce(
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Waiting for ${2 - playerCount} more ${(2 - playerCount) == 1 ? "player" : "players"}...',
+                      'Waiting for ${4 - playerCount} more ${(4 - playerCount) == 1 ? "player" : "players"}...',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
