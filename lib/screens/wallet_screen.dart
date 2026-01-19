@@ -1417,13 +1417,7 @@ class _PaystackPaymentScreenState extends State<PaystackPaymentScreen> {
 
   void _checkPaymentStatus(String url) {
     print('Current URL: $url');
-
-    if (url.contains('checkout.paystack.com/close') || 
-        url.contains('standard.paystack.co/close')) {
-      _handlePaymentComplete();
-    } else if (url.contains('trxref=') || url.contains('reference=')) {
-      _handlePaymentComplete();
-    } else if (url.contains('cancelled=true') || url.contains('cancel')) {
+    if (url.contains('cancelled=true') || url.contains('cancel=true')) {
       _handlePaymentCancelled();
     }
   }
@@ -1441,33 +1435,33 @@ class _PaystackPaymentScreenState extends State<PaystackPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        final shouldPop = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Close Payment?'),
-            content: const Text(
-              'If you\'re using bank transfer, your payment will be verified automatically within a few minutes.\n\nAre you sure you want to close?'
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Continue Payment'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Close'),
-              ),
-            ],
+    onWillPop: () async {
+      final shouldPop = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Exit Payment?'),
+          content: const Text(
+            'If you selected "Bank Transfer" and completed payment in your banking app, please wait a few minutes for verification.\n\nIf you want to exit anyway, your payment will be checked in the background.',
           ),
-        );
-        
-        if (shouldPop == true) {
-          Navigator.of(context).pop(null); // null means user closed manually
-        }
-        return false;
-      },
-      child: Scaffold(
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Stay'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Exit'),
+            ),
+          ],
+        ),
+      );
+      
+      if (shouldPop == true && mounted) {
+        Navigator.of(context).pop(null); // null means user closed manually
+      }
+      return false;
+    },
+    child: Scaffold(
         appBar: AppBar(
           title: const Text('Complete Payment'),
           centerTitle: true,
@@ -1477,25 +1471,25 @@ class _PaystackPaymentScreenState extends State<PaystackPaymentScreen> {
               final shouldClose = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Close Payment?'),
+                  title: const Text('Exit Payment?'),
                   content: const Text(
-                    'If you\'re using bank transfer, your payment will be verified automatically within a few minutes.\n\nAre you sure you want to close?'
+                    'If you selected "Bank Transfer" and completed payment in your banking app, please wait a few minutes for verification.\n\nIf you want to exit anyway, your payment will be checked in the background.',
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Continue Payment'),
+                      child: const Text('Stay'),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Close'),
+                      child: const Text('Exit'),
                     ),
                   ],
                 ),
               );
               
               if (shouldClose == true && mounted) {
-                Navigator.of(context).pop(null);
+                Navigator.of(context).pop(null); // null means user closed manually
               }
             },
           ),
