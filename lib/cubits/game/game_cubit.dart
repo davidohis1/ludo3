@@ -163,7 +163,6 @@ Future<void> joinExistingGame({
 }) async {
   try {
     print('\n🎯 STEP 2: joinExistingGame() executing');
-    print('   Expected: User added to game.playerIds, color assigned');
 
     if (gameId.isEmpty) throw Exception('Game ID cannot be empty');
     if (userId.isEmpty) throw Exception('User ID cannot be empty');
@@ -180,7 +179,16 @@ Future<void> joinExistingGame({
       throw Exception('Game is not accepting players');
     }
 
-    // ✅ NEW: Deduct entry fee from joining player
+    // ✅ CHECK 1: Is user already in this game?
+    if (existingGame.playerIds.contains(userId)) {
+      print('   ✅ User is already in this game');
+      _currentGameId = gameId;
+      _currentUserId = userId;
+      _startGameStream(gameId, userId); // Just start listening
+      return; // Exit - don't add user again
+    }
+
+    // ✅ Only deduct entry fee if user is NOT already in game
     await _gameService.deductEntryFee(
       userId: userId,
       entryFee: existingGame.entryFee,
@@ -219,29 +227,22 @@ Future<void> joinExistingGame({
     });
 
     print('   ✅ Got: Player added to game');
-    print('   ✅ Got: Entry fee deducted from player');
-    print('   ✅ Got: Total players = ${updatedPlayerIds.length}');
-    print('   ✅ Got: Player color = ${updatedPlayerColors[userId]}');
 
-    // ✅ AUTO-START LOGIC: Check if we now have 2 players (changed from 4 for testing)
+    // ✅ AUTO-START LOGIC
     if (updatedPlayerIds.length == 2) {
       print('🎯 Lobby full! Auto-starting game with 2 players...');
       
-      // ✅ CRITICAL FIX: Start listening to game stream BEFORE the delay
       _startGameStream(gameId, userId);
       
-      // Small delay to show "Game starting" message in UI
       await Future.delayed(const Duration(seconds: 3));
       
       print('🚀 Starting game now...');
       
-      // Auto-start the game using the host's ID (first player)
       final hostId = existingGame.playerIds.first;
       await _gameService.startGame(gameId, hostId);
       
       print('   ✅ Got: Game auto-started with 2 players');
     } else {
-      // Start listening to game stream for lobby updates
       _startGameStream(gameId, userId);
     }
   } catch (e) {
@@ -249,7 +250,6 @@ Future<void> joinExistingGame({
     emit(GameError('Failed to join game: $e'));
   }
 }
-
   // ==================== START GAME AS HOST ====================
 
   Future<void> startGameAsHost(String gameId) async {
