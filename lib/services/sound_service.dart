@@ -16,19 +16,15 @@ class SoundService {
   
   // ========== BACKGROUND MUSIC METHODS ==========
   
-  /// Start playing background music (looped)
   static Future<void> startBackgroundMusic() async {
     try {
       await stopBackgroundMusic();
       
       _backgroundMusicPlayer = AudioPlayer();
       
-      // ✅ Use setSource() then play() for better reliability
       await _backgroundMusicPlayer!.setSource(AssetSource(_sounds['background']!));
       await _backgroundMusicPlayer!.setVolume(0.5);
       await _backgroundMusicPlayer!.setReleaseMode(ReleaseMode.loop);
-      
-      // ✅ Play after setting everything
       await _backgroundMusicPlayer!.resume();
       
       print('🎵 Background music started');
@@ -37,7 +33,6 @@ class SoundService {
     }
   }
   
-  /// Stop background music
   static Future<void> stopBackgroundMusic() async {
     if (_backgroundMusicPlayer != null) {
       await _backgroundMusicPlayer!.stop();
@@ -47,7 +42,6 @@ class SoundService {
     }
   }
   
-  /// Pause background music
   static Future<void> pauseBackgroundMusic() async {
     if (_backgroundMusicPlayer != null) {
       await _backgroundMusicPlayer!.pause();
@@ -55,7 +49,6 @@ class SoundService {
     }
   }
   
-  /// Resume background music
   static Future<void> resumeBackgroundMusic() async {
     if (_backgroundMusicPlayer != null) {
       await _backgroundMusicPlayer!.resume();
@@ -63,17 +56,14 @@ class SoundService {
     }
   }
   
-  /// Set background music volume (0.0 to 1.0)
   static Future<void> setBackgroundVolume(double volume) async {
     if (_backgroundMusicPlayer != null) {
       await _backgroundMusicPlayer!.setVolume(volume.clamp(0.0, 1.0));
     }
   }
   
-  /// Check if background music is playing
   static bool isBackgroundMusicPlaying() {
-    return _backgroundMusicPlayer != null && 
-           (_backgroundMusicPlayer!.state == PlayerState.playing);
+    return _backgroundMusicPlayer != null;
   }
   
   // ========== SOUND EFFECTS METHODS ==========
@@ -82,7 +72,6 @@ class SoundService {
     try {
       final player = AudioPlayer();
       
-      // ✅ Wait for playback to start
       await player.setSource(AssetSource(_sounds[soundKey]!));
       await player.resume();
       
@@ -94,24 +83,24 @@ class SoundService {
         _players.remove(soundKey);
       });
       
-      // Also clean up on error
-      player.onPlayerError.listen((error) {
-        print('🎵 Sound error: $error');
-        player.dispose();
-        _players.remove(soundKey);
-      });
+      // ❌ REMOVE THIS LINE - onPlayerError doesn't exist
+      // player.onPlayerError.listen((error) {
+      //   print('🎵 Sound error: $error');
+      //   player.dispose();
+      //   _players.remove(soundKey);
+      // });
       
     } catch (e) {
       print('Error playing sound $soundKey: $e');
     }
   }
   
-  static Future<void> playDiceRoll() async => await play('dice');
-  static Future<void> playTokenMove() async => await play('move');
-  static Future<void> playCapture() async => await play('capture');
-  static Future<void> playWin() async => await play('win');
-  static Future<void> playClick() async => await play('click');
-  static Future<void> playError() async => await play('error');
+  static Future<void> playDiceRoll() async => play('dice');
+  static Future<void> playTokenMove() async => play('move');
+  static Future<void> playCapture() async => play('capture');
+  static Future<void> playWin() async => play('win');
+  static Future<void> playClick() async => play('click');
+  static Future<void> playError() async => play('error');
   
   static Future<void> stopAll() async {
     // Stop sound effects
