@@ -2,7 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 
 class SoundService {
   static final Map<String, AudioPlayer> _players = {};
-  static AudioPlayer? _backgroundMusicPlayer; // Add this
+  static AudioPlayer? _backgroundMusicPlayer;
   
   static const Map<String, String> _sounds = {
     'dice': 'assets/sounds/piecemove.wav',
@@ -11,7 +11,7 @@ class SoundService {
     'win': 'assets/sounds/endgame.wav',
     'click': 'assets/sounds/piecemove.wav',
     'error': 'assets/sounds/endgame.mp3',
-    'background': 'assets/sounds/startgame.mp3', // Add background music
+    'background': 'assets/sounds/startgame.mp3',
   };
   
   // ========== BACKGROUND MUSIC METHODS ==========
@@ -19,20 +19,17 @@ class SoundService {
   /// Start playing background music (looped)
   static Future<void> startBackgroundMusic() async {
     try {
-      // Stop any existing background music
       await stopBackgroundMusic();
       
-      // Create new player for background music
       _backgroundMusicPlayer = AudioPlayer();
       
-      // Set volume (0.0 to 1.0)
+      // ✅ Use setSource() then play() for better reliability
+      await _backgroundMusicPlayer!.setSource(AssetSource(_sounds['background']!));
       await _backgroundMusicPlayer!.setVolume(0.5);
-      
-      // Set to loop
       await _backgroundMusicPlayer!.setReleaseMode(ReleaseMode.loop);
       
-      // Play the background music
-      await _backgroundMusicPlayer!.play(AssetSource(_sounds['background']!));
+      // ✅ Play after setting everything
+      await _backgroundMusicPlayer!.resume();
       
       print('🎵 Background music started');
     } catch (e) {
@@ -75,15 +72,20 @@ class SoundService {
   
   /// Check if background music is playing
   static bool isBackgroundMusicPlaying() {
-    return _backgroundMusicPlayer != null;
+    return _backgroundMusicPlayer != null && 
+           (_backgroundMusicPlayer!.state == PlayerState.playing);
   }
   
-  // ========== SOUND EFFECTS METHODS (KEEP YOUR EXISTING CODE) ==========
+  // ========== SOUND EFFECTS METHODS ==========
   
   static Future<void> play(String soundKey) async {
     try {
       final player = AudioPlayer();
-      await player.play(AssetSource(_sounds[soundKey]!));
+      
+      // ✅ Wait for playback to start
+      await player.setSource(AssetSource(_sounds[soundKey]!));
+      await player.resume();
+      
       _players[soundKey] = player;
       
       // Clean up when done
@@ -91,17 +93,25 @@ class SoundService {
         player.dispose();
         _players.remove(soundKey);
       });
+      
+      // Also clean up on error
+      player.onPlayerError.listen((error) {
+        print('🎵 Sound error: $error');
+        player.dispose();
+        _players.remove(soundKey);
+      });
+      
     } catch (e) {
       print('Error playing sound $soundKey: $e');
     }
   }
   
-  static Future<void> playDiceRoll() async => play('dice');
-  static Future<void> playTokenMove() async => play('move');
-  static Future<void> playCapture() async => play('capture');
-  static Future<void> playWin() async => play('win');
-  static Future<void> playClick() async => play('click');
-  static Future<void> playError() async => play('error');
+  static Future<void> playDiceRoll() async => await play('dice');
+  static Future<void> playTokenMove() async => await play('move');
+  static Future<void> playCapture() async => await play('capture');
+  static Future<void> playWin() async => await play('win');
+  static Future<void> playClick() async => await play('click');
+  static Future<void> playError() async => await play('error');
   
   static Future<void> stopAll() async {
     // Stop sound effects
