@@ -229,19 +229,19 @@ Future<void> joinExistingGame({
     print('   ✅ Got: Player added to game');
 
     // ✅ AUTO-START LOGIC
-    if (updatedPlayerIds.length == 2) {
-      print('🎯 Lobby full! Auto-starting game with 2 players...');
+    if (updatedPlayerIds.length == 4) {
+      print('🎯 Lobby full! Auto-starting game with 4 players...');
       
       _startGameStream(gameId, userId);
       
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 5));
       
       print('🚀 Starting game now...');
       
       final hostId = existingGame.playerIds.first;
       await _gameService.startGame(gameId, hostId);
       
-      print('   ✅ Got: Game auto-started with 2 players');
+      print('   ✅ Got: Game auto-started with 4 players');
     } else {
       _startGameStream(gameId, userId);
     }
