@@ -449,7 +449,7 @@ Future<List<GameModel>> _getAvailableGamesOnce(
 
   Widget _buildGameCard(BuildContext context, GameModel game) {
     final playerCount = game.playerIds.length;
-    const maxPlayers = 2; // You can get this from game if stored
+    const maxPlayers = 4; // You can get this from game if stored
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
