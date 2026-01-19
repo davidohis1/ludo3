@@ -12,7 +12,7 @@ android {
     namespace = "com.example.ludotitan"
     
     // CRITICAL FIX: Explicitly set to 34 for Android 11+ support
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
