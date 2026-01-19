@@ -7,7 +7,7 @@ class AppConstants {
   static const int initialRating = 100;
   
   // Game Constants
-  static const int maxPlayers = 2;
+  static const int maxPlayers = 4;
   static const int tokensPerPlayer = 4;
   static const int boardSize = 15;
   static const int homePositions = 6;
