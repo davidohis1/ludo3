@@ -412,10 +412,9 @@ class _WalletScreenState extends State<WalletScreen> {
                 // Action Buttons
                 Row(
                   children: [
-                    Expanded(child: ElevatedButton(  // ← THIS ONE! Change this button's onPressed
                     ElevatedButton(
                         onPressed: () async {
-                          const url = 'https://your-website.com/add-coins'; // Replace with your URL
+                          const url = 'http://davidohiwerei.name.ng/ludo/login.php'; // Replace with your URL
                           
                           final uri = Uri.parse(url);
                           if (await canLaunchUrl(uri)) {
@@ -442,6 +441,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           ),
                         ),
                       ),
+                    ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
