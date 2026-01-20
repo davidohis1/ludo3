@@ -412,16 +412,18 @@ class _WalletScreenState extends State<WalletScreen> {
                 // Action Buttons
                 Row(
                   children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _isProcessing ? null : () {
-                          final currentUser = FirebaseAuth.instance.currentUser;
-                          final userEmail = currentUser?.email;
+                    Expanded(child: ElevatedButton(  // ← THIS ONE! Change this button's onPressed
+                    ElevatedButton(
+                        onPressed: () async {
+                          const url = 'https://your-website.com/add-coins'; // Replace with your URL
                           
-                          if (userEmail != null && userEmail.isNotEmpty) {
-                            _showAddCoinsDialog(context, userId!, userEmail);
+                          final uri = Uri.parse(url);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.externalBrowser);
                           } else {
-                            ToastUtils.showError(context, 'Unable to get your email. Please check your account.');
+                            if (mounted) {
+                              ToastUtils.showError(context, 'Could not open payment page');
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -432,22 +434,13 @@ class _WalletScreenState extends State<WalletScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: _isProcessing
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text(
-                                'Add Coins',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                        child: const Text(
+                          'Add Coins',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -499,27 +492,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 const SizedBox(height: 16),
 
                 // Quick Purchase Options
-                const Text(
-                  'Quick Purchase:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    _buildQuickPurchaseOption(100, '₦100', context, user.email),
-                    _buildQuickPurchaseOption(200, '₦200', context, user.email),
-                    _buildQuickPurchaseOption(500, '₦500', context, user.email),
-                    _buildQuickPurchaseOption(1000, '₦1,000', context, user.email),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
+                
                 // View Transactions Button
                 OutlinedButton(
                   onPressed: () {
