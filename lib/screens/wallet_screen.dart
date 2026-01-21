@@ -418,7 +418,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           
                           final uri = Uri.parse(url);
                           if (await canLaunchUrl(uri)) {
-                            await launchUrl(uri, mode: LaunchMode.externalBrowser);
+                            await launchUrl(uri);
                           } else {
                             if (mounted) {
                               ToastUtils.showError(context, 'Could not open payment page');
@@ -441,8 +441,8 @@ class _WalletScreenState extends State<WalletScreen> {
                           ),
                         ),
                       ),
-                    ),
-                    ),
+                    ],
+                  ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
@@ -486,8 +486,7 @@ class _WalletScreenState extends State<WalletScreen> {
                               ),
                       ),
                     ),
-                  ],
-                ),
+        
 
                 const SizedBox(height: 16),
 
